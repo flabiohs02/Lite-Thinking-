@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +15,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@RequiredArgsConstructor
+
 @Tag(name = "Category", description = "Endpoints para la gestión de categorías de productos")
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @PostMapping
     @Operation(summary = "Crear una nueva categoría", description = "Registra una categoría con nombre único.")

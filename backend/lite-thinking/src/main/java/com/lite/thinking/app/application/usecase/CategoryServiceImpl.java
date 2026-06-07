@@ -7,7 +7,6 @@ import com.lite.thinking.app.domain.exception.EntityAlreadyExistsException;
 import com.lite.thinking.app.domain.exception.EntityNotFoundException;
 import com.lite.thinking.app.domain.model.Category;
 import com.lite.thinking.app.domain.repository.CategoryRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     @Transactional

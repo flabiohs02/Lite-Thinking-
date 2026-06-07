@@ -11,4 +11,5 @@ public interface ProductRepository {
     void deleteByCode(String code);
     boolean existsByCode(String code);
     List<Product> findByCompanyNit(String companyNit);
+    long count();
 }

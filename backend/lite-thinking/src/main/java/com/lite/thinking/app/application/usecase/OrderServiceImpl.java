@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
@@ -30,21 +29,32 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final InventoryRepository inventoryRepository;
 
+    public OrderServiceImpl(OrderRepository orderRepository, UserRepository userRepository,
+            ProductRepository productRepository, InventoryRepository inventoryRepository) {
+        this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.productRepository = productRepository;
+        this.inventoryRepository = inventoryRepository;
+    }
+
     @Override
     @Transactional
     public OrderResponseDto createOrder(OrderRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-                .orElseThrow(() -> new EntityNotFoundException("El usuario con ID " + requestDto.getUserId() + " no existe. No se puede crear la orden."));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "El usuario con ID " + requestDto.getUserId() + " no existe. No se puede crear la orden."));
 
         List<OrderItem> items = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItemRequestDto itemDto : requestDto.getItems()) {
             Product product = productRepository.findByCode(itemDto.getProductCode())
-                    .orElseThrow(() -> new EntityNotFoundException("El producto con código " + itemDto.getProductCode() + " no existe. No se puede agregar a la orden."));
+                    .orElseThrow(() -> new EntityNotFoundException("El producto con código " + itemDto.getProductCode()
+                            + " no existe. No se puede agregar a la orden."));
 
             if (!product.isActive()) {
-                throw new EntityNotFoundException("El producto con código " + product.getCode() + " no está activo. No se puede agregar a la orden.");
+                throw new EntityNotFoundException("El producto con código " + product.getCode()
+                        + " no está activo. No se puede agregar a la orden.");
             }
 
             List<Inventory> availableInventories = inventoryRepository.findByProductCode(product.getCode()).stream()
@@ -58,17 +68,20 @@ public class OrderServiceImpl implements OrderService {
                     .sum();
 
             if (totalStock <= 1) {
-                throw new EntityNotFoundException("El producto con código " + product.getCode() + " no tiene stock disponible para ordenar.");
+                throw new EntityNotFoundException(
+                        "El producto con código " + product.getCode() + " no tiene stock disponible para ordenar.");
             }
 
             if (itemDto.getQuantity() > totalStock) {
-                throw new EntityNotFoundException("El producto con código " + product.getCode() + " solo tiene " + totalStock + " unidades disponibles.");
+                throw new EntityNotFoundException("El producto con código " + product.getCode() + " solo tiene "
+                        + totalStock + " unidades disponibles.");
             }
 
             ProductPrice priceInfo = product.getPrices().stream()
                     .filter(p -> p.getCurrency().equalsIgnoreCase(itemDto.getCurrency()))
                     .findFirst()
-                    .orElseThrow(() -> new EntityNotFoundException("El producto con código " + product.getCode() + " no tiene un precio definido en la moneda " + itemDto.getCurrency()));
+                    .orElseThrow(() -> new EntityNotFoundException("El producto con código " + product.getCode()
+                            + " no tiene un precio definido en la moneda " + itemDto.getCurrency()));
 
             discountStock(availableInventories, itemDto.getQuantity());
 
@@ -89,7 +102,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
-                .status(requestDto.getStatus() == null || requestDto.getStatus().isBlank() ? "PENDING" : requestDto.getStatus())
+                .status(requestDto.getStatus() == null || requestDto.getStatus().isBlank() ? "PENDING"
+                        : requestDto.getStatus())
                 .total(total)
                 .items(items)
                 .isActive(requestDto.getIsActive() == null || requestDto.getIsActive())

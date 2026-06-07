@@ -10,4 +10,5 @@ public interface CompanyRepository {
     List<Company> findAll();
     void deleteByNit(String nit);
     boolean existsByNit(String nit);
+    long count();
 }

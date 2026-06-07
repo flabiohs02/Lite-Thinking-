@@ -27,35 +27,15 @@ function isExpired(token: string): boolean {
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem(TOKEN_KEY));
-  const isVisitor = ref(localStorage.getItem('lite-thinking-visitor') === 'true');
   const currentUser = ref<UserResponse | null>(null);
   const ready = ref(false);
 
-  const isAuthenticated = computed(() => Boolean(token.value) || isVisitor.value);
+  const isAuthenticated = computed(() => Boolean(token.value));
   const isAdmin = computed(() => currentUser.value?.role?.name?.toUpperCase() === 'ADMIN');
   const isClient = computed(() => currentUser.value?.role?.name?.toUpperCase() === 'CLIENT');
+  const isExternal = computed(() => currentUser.value?.role?.name?.toUpperCase() === 'EXTERNAL');
 
   async function bootstrap() {
-    if (isVisitor.value) {
-      currentUser.value = {
-        id: 0,
-        name: 'Visitante',
-        identification: '00000000',
-        isActive: true,
-        role: {
-          id: 0,
-          name: 'VISITOR',
-          isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      ready.value = true;
-      return;
-    }
-
     if (!token.value || isExpired(token.value)) {
       logout();
       ready.value = true;
@@ -77,54 +57,27 @@ export const useAuthStore = defineStore('auth', () => {
   async function signIn(credentials: AuthRequest) {
     const response = await login(credentials);
     token.value = response.token;
-    isVisitor.value = false;
-    localStorage.removeItem('lite-thinking-visitor');
     localStorage.setItem(TOKEN_KEY, response.token);
     ready.value = false;
     await bootstrap();
   }
 
-  function enterAsVisitor() {
-    isVisitor.value = true;
-    localStorage.setItem('lite-thinking-visitor', 'true');
-    token.value = null;
-    localStorage.removeItem(TOKEN_KEY);
-    currentUser.value = {
-      id: 0,
-      name: 'Visitante',
-      identification: '00000000',
-      isActive: true,
-      role: {
-        id: 0,
-        name: 'VISITOR',
-        isActive: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-  }
-
   function logout() {
     token.value = null;
-    isVisitor.value = false;
     currentUser.value = null;
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem('lite-thinking-visitor');
   }
 
   return {
     token,
-    isVisitor,
     currentUser,
     ready,
     isAuthenticated,
     isAdmin,
     isClient,
+    isExternal,
     bootstrap,
     signIn,
-    enterAsVisitor,
     logout
   };
 });

@@ -14,4 +14,5 @@ public interface InventoryRepository {
     void deleteById(Long id);
     boolean existsById(Long id);
     boolean existsByProductCodeAndCompanyNit(String productCode, String companyNit);
+    long count();
 }

@@ -31,9 +31,13 @@ const navItems = [
   { to: '/dashboard/roles', label: 'Roles', icon: Shield }
 ];
 
+const externalNavItems = [
+  { to: '/dashboard/companies', label: 'Empresas', icon: Building2 },
+];
+
 const filteredNavItems = computed(() => {
-  if (auth.isVisitor) {
-    return [];
+  if (auth.isExternal) {
+    return externalNavItems;
   }
   if (auth.isClient) {
     return navItems.filter((item) => item.to === '/dashboard/store' || item.to === '/dashboard/my-orders');
@@ -64,7 +68,7 @@ async function logout() {
         <div class="brand-dot">LT</div>
         <div>
           <strong>Lite Thinking</strong>
-          <span>{{ auth.isClient ? 'Tienda online' : 'Backoffice' }}</span>
+          <span>{{ auth.isClient ? 'Tienda online' : auth.isExternal ? 'Consulta externa' : 'Backoffice' }}</span>
         </div>
       </div>
 
@@ -79,8 +83,8 @@ async function logout() {
     <div class="main-shell">
       <header class="topbar">
         <div>
-          <span class="eyebrow">{{ auth.isClient ? 'Compra online' : 'Panel operativo' }}</span>
-          <h1>{{ auth.isClient ? 'Catalogo de productos' : 'Gestion comercial' }}</h1>
+          <span class="eyebrow">{{ auth.isClient ? 'Compra online' : auth.isExternal ? 'Consulta externa' : 'Panel operativo' }}</span>
+          <h1>{{ auth.isClient ? 'Catalogo de productos' : auth.isExternal ? 'Empresas' : 'Gestion comercial' }}</h1>
         </div>
         <div class="user-area">
           <div class="avatar">{{ initials }}</div>

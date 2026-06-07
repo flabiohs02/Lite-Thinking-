@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Inventory;
 import com.lite.thinking.app.domain.repository.InventoryRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.InventoryEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.InventoryJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class InventoryPersistenceAdapter implements InventoryRepository {
 
     private final InventoryJpaRepository inventoryJpaRepository;
+
+    public InventoryPersistenceAdapter(InventoryJpaRepository inventoryJpaRepository) {
+        this.inventoryJpaRepository = inventoryJpaRepository;
+    }
 
     @Override
     public Inventory save(Inventory inventory) {
@@ -71,5 +73,10 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
     @Override
     public boolean existsByProductCodeAndCompanyNit(String productCode, String companyNit) {
         return inventoryJpaRepository.existsByProductCodeAndCompanyNit(productCode, companyNit);
+    }
+
+    @Override
+    public long count() {
+        return inventoryJpaRepository.count();
     }
 }

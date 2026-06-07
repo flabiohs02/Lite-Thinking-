@@ -12,4 +12,5 @@ public interface CategoryRepository {
     boolean existsById(Long id);
     boolean existsByName(String name);
     List<Category> findAllByIds(List<Long> ids);
+    long count();
 }

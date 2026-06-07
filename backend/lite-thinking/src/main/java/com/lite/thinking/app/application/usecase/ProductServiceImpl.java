@@ -21,12 +21,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CompanyRepository companyRepository;
     private final CategoryRepository categoryRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository,
+            CompanyRepository companyRepository, CategoryRepository categoryRepository) {
+        this.productRepository = productRepository;
+        this.companyRepository = companyRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     @Transactional
@@ -36,7 +42,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Company company = companyRepository.findByNit(requestDto.getCompanyNit())
-                .orElseThrow(() -> new EntityNotFoundException("La empresa con NIT " + requestDto.getCompanyNit() + " no existe. No se puede asociar el producto."));
+                .orElseThrow(() -> new EntityNotFoundException("La empresa con NIT " + requestDto.getCompanyNit()
+                        + " no existe. No se puede asociar el producto."));
 
         List<Category> categories = new ArrayList<>();
         if (requestDto.getCategoryIds() != null && !requestDto.getCategoryIds().isEmpty()) {
@@ -55,7 +62,8 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(readOnly = true)
     public ProductResponseDto getProductByCode(String code) {
         Product product = productRepository.findByCode(code)
-                .orElseThrow(() -> new EntityNotFoundException("El producto con código " + code + " no fue encontrado."));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("El producto con código " + code + " no fue encontrado."));
         return ProductMapper.toResponseDto(product);
     }
 
@@ -71,10 +79,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponseDto updateProduct(String code, ProductRequestDto requestDto) {
         Product existingProduct = productRepository.findByCode(code)
-                .orElseThrow(() -> new EntityNotFoundException("El producto con código " + code + " no fue encontrado."));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("El producto con código " + code + " no fue encontrado."));
 
         Company company = companyRepository.findByNit(requestDto.getCompanyNit())
-                .orElseThrow(() -> new EntityNotFoundException("La empresa con NIT " + requestDto.getCompanyNit() + " no existe."));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "La empresa con NIT " + requestDto.getCompanyNit() + " no existe."));
 
         List<Category> categories = new ArrayList<>();
         if (requestDto.getCategoryIds() != null && !requestDto.getCategoryIds().isEmpty()) {

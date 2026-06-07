@@ -128,7 +128,7 @@ async function loadStore() {
 }
 
 async function submitDirectOrder() {
-  if (!auth.currentUser?.id || !auth.isAuthenticated || auth.isVisitor) {
+  if (!auth.currentUser?.id || !auth.isAuthenticated) {
     await router.push({ name: 'login', query: { redirect: route.fullPath } });
     return;
   }
@@ -181,7 +181,7 @@ onMounted(async () => {
         <p>Explora el catálogo, arma tu carrito y accede para completar tu compra.</p>
       </div>
       <div class="heading-actions">
-        <RouterLink v-if="!auth.isAuthenticated || auth.isVisitor" class="secondary-button" to="/login">Iniciar sesión</RouterLink>
+        <RouterLink v-if="!auth.isAuthenticated" class="secondary-button" to="/login">Iniciar sesión</RouterLink>
         <button class="secondary-button" type="button" @click="loadStore">Actualizar</button>
       </div>
     </div>
@@ -291,7 +291,7 @@ onMounted(async () => {
         <div class="dialog-actions">
           <button class="secondary-button" type="button" :disabled="ordering" @click="closeOrderModal">Cancelar</button>
           
-          <RouterLink v-if="!auth.isAuthenticated || auth.isVisitor" to="/login" class="primary-button" style="text-decoration: none; text-align: center; justify-content: center; display: inline-flex;">
+          <RouterLink v-if="!auth.isAuthenticated" to="/login" class="primary-button" style="text-decoration: none; text-align: center; justify-content: center; display: inline-flex;">
             Iniciar sesión para comprar
           </RouterLink>
           <button v-else class="primary-button" type="button" :disabled="ordering" @click="submitDirectOrder">

@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/inventories")
-@RequiredArgsConstructor
 @Tag(name = "Inventory", description = "Endpoints para la gestión del inventario de productos por empresa")
 public class InventoryController {
 
     private final InventoryService inventoryService;
+
+    public InventoryController(InventoryService inventoryService) {
+        this.inventoryService = inventoryService;
+    }
 
     @PostMapping
     @Operation(summary = "Crear un nuevo registro de inventario", description = "Registra la relación de stock para un producto en una empresa.")

@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Role;
 import com.lite.thinking.app.domain.repository.RoleRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.RoleEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.RoleJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+
 public class RolePersistenceAdapter implements RoleRepository {
 
     private final RoleJpaRepository roleJpaRepository;
+
+    public RolePersistenceAdapter(RoleJpaRepository roleJpaRepository) {
+        this.roleJpaRepository = roleJpaRepository;
+    }
 
     @Override
     public Role save(Role role) {

@@ -18,22 +18,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Override
     @Transactional
     public UserResponseDto createUser(UserRequestDto requestDto) {
         if (userRepository.existsByIdentification(requestDto.getIdentification())) {
-            throw new EntityAlreadyExistsException("El usuario con identificación '" + requestDto.getIdentification() + "' ya existe.");
+            throw new EntityAlreadyExistsException(
+                    "El usuario con identificación '" + requestDto.getIdentification() + "' ya existe.");
         }
 
         Role role = roleRepository.findById(requestDto.getRoleId())
-                .orElseThrow(() -> new EntityNotFoundException("El rol con ID " + requestDto.getRoleId() + " no existe."));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("El rol con ID " + requestDto.getRoleId() + " no existe."));
 
         User user = UserMapper.toDomain(requestDto, role);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -53,7 +61,8 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUserByIdentification(String identification) {
         User user = userRepository.findByIdentification(identification)
-                .orElseThrow(() -> new EntityNotFoundException("El usuario con identificación " + identification + " no fue encontrado."));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "El usuario con identificación " + identification + " no fue encontrado."));
         return UserMapper.toResponseDto(user);
     }
 
@@ -73,11 +82,13 @@ public class UserServiceImpl implements UserService {
 
         if (!existingUser.getIdentification().equalsIgnoreCase(requestDto.getIdentification()) &&
                 userRepository.existsByIdentification(requestDto.getIdentification())) {
-            throw new EntityAlreadyExistsException("El usuario con identificación '" + requestDto.getIdentification() + "' ya existe.");
+            throw new EntityAlreadyExistsException(
+                    "El usuario con identificación '" + requestDto.getIdentification() + "' ya existe.");
         }
 
         Role role = roleRepository.findById(requestDto.getRoleId())
-                .orElseThrow(() -> new EntityNotFoundException("El rol con ID " + requestDto.getRoleId() + " no existe."));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("El rol con ID " + requestDto.getRoleId() + " no existe."));
 
         existingUser.setIdentification(requestDto.getIdentification());
         existingUser.setName(requestDto.getName());

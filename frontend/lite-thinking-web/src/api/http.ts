@@ -3,6 +3,7 @@ import router from '../router';
 import { useAuthStore } from '../stores/auth';
 
 export const api = axios.create({
+  // baseURL: import.meta.env.VITE_API_BASE_URL ?? '/lite/api/v1',
   baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8686/api/v1',
   timeout: 15000
 });

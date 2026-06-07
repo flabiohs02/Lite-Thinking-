@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,12 +19,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orders")
-@RequiredArgsConstructor
+
 @Tag(name = "Order", description = "Endpoints para la gestión de órdenes de usuarios")
 public class OrderController {
 
     private final OrderService orderService;
     private final UserService userService;
+
+    public OrderController(OrderService orderService, UserService userService) {
+        this.orderService = orderService;
+        this.userService = userService;
+    }
 
     @PostMapping
     @Operation(summary = "Crear una nueva orden", description = "Registra una orden para un usuario con su detalle de productos y cantidades.")

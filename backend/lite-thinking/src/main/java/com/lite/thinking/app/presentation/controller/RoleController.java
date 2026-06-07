@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/roles")
-@RequiredArgsConstructor
 @Tag(name = "Role", description = "Endpoints para la gestión de roles de usuario")
 public class RoleController {
 
     private final RoleService roleService;
+
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @PostMapping
     @Operation(summary = "Crear un nuevo rol", description = "Registra un rol con nombre único.")

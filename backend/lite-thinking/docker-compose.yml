@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17.4
+    container_name: lite-thinking-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: litethinkingdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: all**12**
+    ports:
+      - "5432:5432"
+    volumes:
+      - lite-thinking-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d litethinkingdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lite-thinking-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8686
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/litethinkingdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345678
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+    ports:
+      - "8686:8686"
+
+volumes:
+  lite-thinking-postgres-data:

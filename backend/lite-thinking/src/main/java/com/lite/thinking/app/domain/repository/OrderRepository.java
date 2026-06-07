@@ -11,4 +11,5 @@ public interface OrderRepository {
     List<Order> findByUserId(Long userId);
     void deleteById(Long id);
     boolean existsById(Long id);
+    long count();
 }

@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Product;
 import com.lite.thinking.app.domain.repository.ProductRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.ProductEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.ProductJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+
 public class ProductPersistenceAdapter implements ProductRepository {
 
     private final ProductJpaRepository productJpaRepository;
+
+    public ProductPersistenceAdapter(ProductJpaRepository productJpaRepository) {
+        this.productJpaRepository = productJpaRepository;
+    }
 
     @Override
     public Product save(Product product) {
@@ -53,5 +56,10 @@ public class ProductPersistenceAdapter implements ProductRepository {
         return productJpaRepository.findByCompanyNit(companyNit).stream()
                 .map(ProductMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long count() {
+        return productJpaRepository.count();
     }
 }

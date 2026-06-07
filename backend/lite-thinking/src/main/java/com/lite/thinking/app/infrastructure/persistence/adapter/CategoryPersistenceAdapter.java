@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Category;
 import com.lite.thinking.app.domain.repository.CategoryRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.CategoryEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.CategoryJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+
 public class CategoryPersistenceAdapter implements CategoryRepository {
 
     private final CategoryJpaRepository categoryJpaRepository;
+
+    public CategoryPersistenceAdapter(CategoryJpaRepository categoryJpaRepository) {
+        this.categoryJpaRepository = categoryJpaRepository;
+    }
 
     @Override
     public Category save(Category category) {
@@ -58,5 +61,10 @@ public class CategoryPersistenceAdapter implements CategoryRepository {
         return categoryJpaRepository.findAllById(ids).stream()
                 .map(CategoryMapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long count() {
+        return categoryJpaRepository.count();
     }
 }

@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Order;
 import com.lite.thinking.app.domain.repository.OrderRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.OrderEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.OrderJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
 public class OrderPersistenceAdapter implements OrderRepository {
 
     private final OrderJpaRepository orderJpaRepository;
+
+    public OrderPersistenceAdapter(OrderJpaRepository orderJpaRepository) {
+        this.orderJpaRepository = orderJpaRepository;
+    }
 
     @Override
     public Order save(Order order) {
@@ -53,5 +55,10 @@ public class OrderPersistenceAdapter implements OrderRepository {
     @Override
     public boolean existsById(Long id) {
         return orderJpaRepository.existsById(id);
+    }
+
+    @Override
+    public long count() {
+        return orderJpaRepository.count();
     }
 }

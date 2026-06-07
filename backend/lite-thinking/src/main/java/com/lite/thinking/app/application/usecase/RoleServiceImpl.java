@@ -7,7 +7,6 @@ import com.lite.thinking.app.domain.exception.EntityAlreadyExistsException;
 import com.lite.thinking.app.domain.exception.EntityNotFoundException;
 import com.lite.thinking.app.domain.model.Role;
 import com.lite.thinking.app.domain.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
+
+    public RoleServiceImpl(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     @Transactional

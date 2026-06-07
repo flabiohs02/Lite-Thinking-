@@ -6,6 +6,20 @@ El sistema permite administrar el catálogo de productos, el control de inventar
 
 ---
 
+## Contenerización y Despliegue
+
+El proyecto ya incluye:
+
+- `backend/lite-thinking/Dockerfile`
+- `frontend/lite-thinking-web/Dockerfile`
+- `backend/lite-thinking/docker-compose.yml`
+- Manifiestos de Kubernetes para GKE en `deploy/gke/`
+
+La API del frontend se publica en la misma ruta del dominio usando `/api/v1`, mientras que el backend expone Swagger en `/swagger-ui.html` y OpenAPI en `/api-docs`.
+Para desarrollo local, `docker compose` levanta el backend junto con PostgreSQL.
+
+---
+
 ## 🛠️ Tecnologías Utilizadas
 
 ### Backend
@@ -15,7 +29,7 @@ El sistema permite administrar el catálogo de productos, el control de inventar
 | **Framework** | Spring Boot 4.x |
 | **Seguridad** | Spring Security + JWT (JSON Web Tokens) |
 | **Persistencia** | Spring Data JPA / Hibernate |
-| **Base de Datos** | PostgreSQL 17 (vía Docker en puerto `15432`) |
+| **Base de Datos** | PostgreSQL 17 (contenedor Docker para local; servicio en GKE para despliegue) |
 | **Gestor de Dependencias** | Maven 4.x (wrapper `./mvnw` incluido) |
 | **Documentación API** | Springdoc OpenAPI / Swagger UI |
 
@@ -78,18 +92,24 @@ LiteThinking/
 
 ## 🗄️ Base de Datos
 
-La aplicación usa **PostgreSQL** corriendo en un contenedor Docker en el puerto `15432`.
+La aplicación usa **PostgreSQL** en contenedor Docker para desarrollo local. Hay dos formas soportadas:
+
+- `docker run`: expone PostgreSQL en el puerto `15432`
+- `docker compose` dentro de `backend/lite-thinking`: expone PostgreSQL en el puerto `5432`
 
 | Parámetro | Valor |
 |---|---|
 | Host | `localhost` |
-| Puerto | `15432` |
+| Puerto `docker run` | `15432` |
+| Puerto `docker compose` | `5432` |
 | Base de datos | `litethinkingdb` |
 | Usuario | `postgres` |
 | Contraseña | `12345678` |
 
 > [!NOTE]
-> La propiedad `spring.jpa.hibernate.ddl-auto=create-drop` en `application.properties` hace que Hibernate **recree el esquema completo** y ejecute `import.sql` en cada arranque. Esto garantiza que los datos de prueba estén siempre disponibles. Para entornos de producción, se recomienda cambiarla a `validate` o `update`.
+> La configuración del backend toma la conexión a base de datos desde variables de entorno:
+> `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`.
+> Por defecto mantiene valores locales para ejecutar el proyecto sin Docker.
 
 ### Datos Iniciales (`import.sql`)
 El archivo `src/main/resources/import.sql` carga automáticamente:
@@ -134,6 +154,23 @@ docker run --name postgres-db \
   -d postgres:17.4
 ```
 
+### 2.1 Levantar Backend + PostgreSQL Con Docker Compose
+
+Desde `backend/lite-thinking`:
+
+```bash
+docker compose up -d --build
+```
+
+Esto levanta el backend en `http://localhost:8686` y PostgreSQL en `localhost:5432`.
+
+### 2.2 Construir Imágenes Docker
+
+```bash
+docker build -t lite-thinking-backend backend/lite-thinking
+docker build -t lite-thinking-frontend frontend/lite-thinking-web
+```
+
 ### 3. Backend (Spring Boot)
 
 El backend expone una API REST en el puerto **`8686`**.
@@ -171,6 +208,20 @@ La aplicación estará disponible en: **`http://localhost:5173`**
 #### Construcción para producción
 ```bash
 npm run build
+```
+
+### 5. Despliegue En GKE
+
+Los manifiestos están en `deploy/gke/`. El orden recomendado es:
+
+```bash
+kubectl apply -f deploy/gke/namespace.yaml
+kubectl apply -f deploy/gke/secret.yaml
+kubectl apply -f deploy/gke/configmap.yaml
+kubectl apply -f deploy/gke/postgres.yaml
+kubectl apply -f deploy/gke/backend.yaml
+kubectl apply -f deploy/gke/frontend.yaml
+kubectl apply -f deploy/gke/ingress.yaml
 ```
 
 ---

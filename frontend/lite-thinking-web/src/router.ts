@@ -13,7 +13,7 @@ const resources: ResourceKey[] = ['companies', 'products', 'categories', 'invent
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: 'public-store', component: StoreView, props: { publicMode: true } },
+    { path: '/lite/', name: 'public-store', component: StoreView, props: { publicMode: true } },
     { path: '/login', name: 'login', component: LoginView },
     {
       path: '/dashboard',
@@ -45,7 +45,7 @@ router.beforeEach(async (to) => {
     return { name: 'login', query: { redirect: to.fullPath } };
   }
 
-  if (auth.isVisitor && to.path !== '/dashboard/companies' && to.name !== 'login') {
+  if (auth.isExternal && to.path !== '/dashboard/companies' && to.name !== 'login') {
     return { name: 'companies' };
   }
 
@@ -54,7 +54,9 @@ router.beforeEach(async (to) => {
   }
 
   if (to.name === 'login' && auth.isAuthenticated) {
-    return auth.isClient ? { name: 'store' } : { name: 'home' };
+    if (auth.isClient) return { name: 'store' };
+    if (auth.isExternal) return { name: 'companies' };
+    return { name: 'home' };
   }
 
   return true;

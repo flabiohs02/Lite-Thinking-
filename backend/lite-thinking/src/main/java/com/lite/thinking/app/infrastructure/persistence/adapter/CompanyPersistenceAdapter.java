@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.Company;
 import com.lite.thinking.app.domain.repository.CompanyRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.CompanyEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.CompanyJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+
 public class CompanyPersistenceAdapter implements CompanyRepository {
 
     private final CompanyJpaRepository companyJpaRepository;
+
+    public CompanyPersistenceAdapter(CompanyJpaRepository companyJpaRepository) {
+        this.companyJpaRepository = companyJpaRepository;
+    }
 
     @Override
     public Company save(Company company) {
@@ -46,5 +49,10 @@ public class CompanyPersistenceAdapter implements CompanyRepository {
     @Override
     public boolean existsByNit(String nit) {
         return companyJpaRepository.existsById(nit);
+    }
+
+    @Override
+    public long count() {
+        return companyJpaRepository.count();
     }
 }

@@ -19,7 +19,7 @@ async function submit() {
   error.value = '';
   try {
     await auth.signIn({ identification: identification.value, password: password.value });
-    const fallback = auth.isClient ? '/dashboard/store' : '/dashboard';
+    const fallback = auth.isClient ? '/dashboard/store' : auth.isExternal ? '/dashboard/companies' : '/dashboard';
     await router.push(String(route.query.redirect ?? fallback));
   } catch (err) {
     error.value = getErrorMessage(err);
@@ -28,10 +28,6 @@ async function submit() {
   }
 }
 
-async function enterAsVisitor() {
-  auth.enterAsVisitor();
-  await router.push('/dashboard/companies');
-}
 </script>
 
 <template>
@@ -54,15 +50,6 @@ async function enterAsVisitor() {
           {{ loading ? 'Ingresando...' : 'Ingresar' }}
         </button>
 
-        <button
-          class="secondary-button full"
-          type="button"
-          :disabled="loading"
-          @click="enterAsVisitor"
-          style="margin-top: 12px;"
-        >
-          Ingresar como visitante
-        </button>
       </form>
     </section>
   </main>

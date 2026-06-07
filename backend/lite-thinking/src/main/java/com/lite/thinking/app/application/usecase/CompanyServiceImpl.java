@@ -7,7 +7,6 @@ import com.lite.thinking.app.domain.exception.EntityAlreadyExistsException;
 import com.lite.thinking.app.domain.exception.EntityNotFoundException;
 import com.lite.thinking.app.domain.model.Company;
 import com.lite.thinking.app.domain.repository.CompanyRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,10 +14,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository) {
+        this.companyRepository = companyRepository;
+    }
 
     @Override
     @Transactional
@@ -52,14 +54,14 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyResponseDto updateCompany(String nit, CompanyRequestDto requestDto) {
         Company existingCompany = companyRepository.findByNit(nit)
                 .orElseThrow(() -> new EntityNotFoundException("La empresa con NIT " + nit + " no fue encontrada."));
-        
+
         existingCompany.setName(requestDto.getName());
         existingCompany.setAddress(requestDto.getAddress());
         existingCompany.setPhone(requestDto.getPhone());
         if (requestDto.getIsActive() != null) {
             existingCompany.setActive(requestDto.getIsActive());
         }
-        
+
         Company updatedCompany = companyRepository.save(existingCompany);
         return CompanyMapper.toResponseDto(updatedCompany);
     }

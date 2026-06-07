@@ -5,7 +5,6 @@ import com.lite.thinking.app.domain.model.User;
 import com.lite.thinking.app.domain.repository.UserRepository;
 import com.lite.thinking.app.infrastructure.persistence.entity.UserEntity;
 import com.lite.thinking.app.infrastructure.persistence.repository.UserJpaRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,10 +12,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@RequiredArgsConstructor
+
 public class UserPersistenceAdapter implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
+
+    public UserPersistenceAdapter(UserJpaRepository userJpaRepository) {
+        this.userJpaRepository = userJpaRepository;
+    }
 
     @Override
     public User save(User user) {
